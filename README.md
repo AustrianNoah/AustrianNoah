@@ -1,5 +1,6 @@
 # About Me 🇦🇹
 
+<a href="https://dc.aktiverstreamer.de" target="_blank"><img src="https://discord.c99.nl/widget/theme-5/586231322993754119.png"></a> <br><br>
 [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=AustrianNoah&layout=donut)](https://github.com/AustrianNoah)
 
 # Stats 🥈
