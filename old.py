@@ -18,7 +18,7 @@ SVG_CARD = f"{OUT_DIR}/github_stats_card.svg"
 COMMIT_MESSAGE = "chore: update profile stats (matplotlib + line counts)"
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # Optional but empfohlen
 # Dateiendungen, die als Quellcode/Text gezählt werden
-CODE_EXTS = {".py", ".js", ".ts", ".java", ".c", ".cpp", ".h", ".hpp", ".go", ".rb", ".rs", ".swift",
+CODE_EXTS = {".py", ".js", ".java", ".c", ".cpp", ".h", ".hpp", ".go", ".rb", ".rs", ".swift",
              ".kt", ".kts", ".scala", ".php", ".html", ".css", ".scss", ".md", ".json", ".yaml", ".yml",
              ".sh", ".ps1", ".lua", ".pl", ".r"}
 # Max Repos to clone (safety)
