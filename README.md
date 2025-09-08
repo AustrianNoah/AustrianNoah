@@ -2,7 +2,11 @@
 
 
 <!-- STATS:START -->
-![github-stats](assets/github-stats.png)
+![languages](assets/stats/github_stats_langs.png)
 
-- **Last update (UTC):** 2025-09-08T21:35:19.291168Z
+<img src="assets/stats/github_stats_card.svg" alt="summary card">
+
+- **Repos:** 44
+- **Followers:** 6
+- **Updated (UTC):** 2025-09-08T21:38:07.740960Z
 <!-- STATS:END -->
