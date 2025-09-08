@@ -11,115 +11,113 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Begrüße neue Follower
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPO_OWNER: ${{ github.repository_owner }}
-      run: |
-        # Erstelle Verzeichnis für Daten falls nicht vorhanden
-        mkdir -p .github/data
-        
-        # Datei für bekannte Follower
-        KNOWN_FOLLOWERS_FILE=".github/data/known_followers.txt"
-        
-        # Aktuelle Follower abrufen
-        echo "🔍 Aktuelle Follower werden abgerufen..."
-        gh api users/$REPO_OWNER/followers --paginate --jq '.[].login' > current_followers.txt
-        
-        # Wenn keine bekannten Follower vorhanden, initialisiere Liste
-        if [ ! -f "$KNOWN_FOLLOWERS_FILE" ]; then
-          echo "📝 Initialisiere Follower-Liste..."
-          cp current_followers.txt "$KNOWN_FOLLOWERS_FILE"
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add "$KNOWN_FOLLOWERS_FILE"
-          git commit -m "Initialisiere Follower-Liste" || true
-          git push || true
-          echo "✅ Follower-Liste initialisiert. Beim nächsten Lauf werden neue Follower begrüßt."
-          exit 0
-        fi
-        
-        # Neue Follower identifizieren
-        echo "🆕 Suche nach neuen Followern..."
-        NEW_FOLLOWERS=$(comm -13 <(sort "$KNOWN_FOLLOWERS_FILE") <(sort current_followers.txt))
-        
-        if [ -z "$NEW_FOLLOWERS" ]; then
-          echo "😊 Keine neuen Follower gefunden."
-        else
-          echo "🎉 Neue Follower gefunden:"
-          echo "$NEW_FOLLOWERS"
+      - name: GitHub CLI installieren
+        run: |
+          if ! command -v gh &> /dev/null; then
+            echo "GitHub CLI wird installiert..."
+            sudo apt update
+            sudo apt install gh -y
+          fi
+
+      - name: Begrüße neue Follower
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          # Erstelle Verzeichnis für Daten falls nicht vorhanden
+          mkdir -p .github/data
           
-          # Für jeden neuen Follower
-          while IFS= read -r follower; do
-            if [ ! -z "$follower" ]; then
-              echo "👋 Begrüße $follower..."
-              
-              # Follower-Informationen abrufen
-              USER_INFO=$(gh api users/$follower)
-              USER_NAME=$(echo "$USER_INFO" | jq -r '.name // .login')
-              USER_BIO=$(echo "$USER_INFO" | jq -r '.bio // "Kein Bio verfügbar"')
-              USER_LOCATION=$(echo "$USER_INFO" | jq -r '.location // "Unbekannt"')
-              USER_COMPANY=$(echo "$USER_INFO" | jq -r '.company // "Keine Firma angegeben"')
-              
-              # Issue erstellen zur Begrüßung
-              ISSUE_BODY="Hallo @$follower! 👋
-
-Herzlich willkommen! Vielen Dank, dass du mir folgst! 🎉
-
-**Deine Informationen:**
-- 👤 Name: $USER_NAME
-- 📍 Standort: $USER_LOCATION
-- 🏢 Firma: $USER_COMPANY
-- 📝 Bio: $USER_BIO
-
-Ich freue mich über dein Interesse an meinen Projekten! Wenn du Fragen hast oder bei einem Projekt mithelfen möchtest, zögere nicht, mich zu kontaktieren.
-
-Happy Coding! 🚀
-
----
-*Diese Nachricht wurde automatisch generiert durch GitHub Actions.*"
-
-              # Issue erstellen
-              gh issue create \
-                --title "Willkommen @$follower! 🎉" \
-                --body "$ISSUE_BODY" \
-                --label "welcome,follower" || echo "❌ Fehler beim Erstellen des Issues für $follower"
-              
-              # Kurze Pause zwischen den Anfragen
-              sleep 2
-            fi
-          done <<< "$NEW_FOLLOWERS"
+          # Datei für bekannte Follower
+          KNOWN_FOLLOWERS_FILE=".github/data/known_followers.txt"
           
-          # Follower-Liste aktualisieren
-          cp current_followers.txt "$KNOWN_FOLLOWERS_FILE"
+          # Aktuelle Follower abrufen
+          echo "🔍 Aktuelle Follower werden abgerufen..."
+          gh api users/$REPO_OWNER/followers --paginate --jq '.[].login' > current_followers.txt
           
-          # Änderungen committen
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add "$KNOWN_FOLLOWERS_FILE"
-          git commit -m "Aktualisiere Follower-Liste - $(echo "$NEW_FOLLOWERS" | wc -l) neue Follower begrüßt" || true
-          git push || true
-        fi
-        
-        # Aufräumen
-        rm -f current_followers.txt
-        
-        echo "✅ Workflow abgeschlossen!"
+          # Wenn keine bekannten Follower vorhanden, initialisiere Liste
+          if [ ! -f "$KNOWN_FOLLOWERS_FILE" ]; then
+            echo "📝 Initialisiere Follower-Liste..."
+            cp current_followers.txt "$KNOWN_FOLLOWERS_FILE"
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git add "$KNOWN_FOLLOWERS_FILE"
+            git commit -m "Initialisiere Follower-Liste" || true
+            git push || true
+            echo "✅ Follower-Liste initialisiert. Beim nächsten Lauf werden neue Follower begrüßt."
+            exit 0
+          fi
+          
+          # Neue Follower identifizieren
+          echo "🆕 Suche nach neuen Followern..."
+          NEW_FOLLOWERS=$(comm -13 <(sort "$KNOWN_FOLLOWERS_FILE") <(sort current_followers.txt))
+          
+          if [ -z "$NEW_FOLLOWERS" ]; then
+            echo "😊 Keine neuen Follower gefunden."
+          else
+            echo "🎉 Neue Follower gefunden:"
+            echo "$NEW_FOLLOWERS"
+            
+            # Für jeden neuen Follower
+            while IFS= read -r follower; do
+              if [ ! -z "$follower" ]; then
+                echo "👋 Begrüße $follower..."
+                
+                # Follower-Informationen abrufen
+                USER_INFO=$(gh api users/$follower)
+                USER_NAME=$(echo "$USER_INFO" | jq -r '.name // .login')
+                USER_BIO=$(echo "$USER_INFO" | jq -r '.bio // "Kein Bio verfügbar"')
+                USER_LOCATION=$(echo "$USER_INFO" | jq -r '.location // "Unbekannt"')
+                USER_COMPANY=$(echo "$USER_INFO" | jq -r '.company // "Keine Firma angegeben"')
+                
+                # Issue erstellen zur Begrüßung
+                ISSUE_BODY="Hallo @$follower! 👋
 
-    - name: GitHub CLI installieren (falls nicht vorhanden)
-      run: |
-        if ! command -v gh &> /dev/null; then
-          echo "GitHub CLI wird installiert..."
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          sudo apt update
-          sudo apt install gh
-        fi
+          Herzlich willkommen! Vielen Dank, dass du mir folgst! 🎉
+
+          **Deine Informationen:**
+          - 👤 Name: $USER_NAME
+          - 📍 Standort: $USER_LOCATION  
+          - 🏢 Firma: $USER_COMPANY
+          - 📝 Bio: $USER_BIO
+
+          Ich freue mich über dein Interesse an meinen Projekten! Wenn du Fragen hast oder bei einem Projekt mithelfen möchtest, zögere nicht, mich zu kontaktieren.
+
+          Happy Coding! 🚀
+
+          ---
+          *Diese Nachricht wurde automatisch generiert durch GitHub Actions.*"
+
+                # Issue erstellen
+                gh issue create \
+                  --title "Willkommen @$follower! 🎉" \
+                  --body "$ISSUE_BODY" \
+                  --label "welcome,follower" || echo "❌ Fehler beim Erstellen des Issues für $follower"
+                
+                # Kurze Pause zwischen den Anfragen
+                sleep 2
+              fi
+            done <<< "$NEW_FOLLOWERS"
+            
+            # Follower-Liste aktualisieren
+            cp current_followers.txt "$KNOWN_FOLLOWERS_FILE"
+            
+            # Änderungen committen
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git add "$KNOWN_FOLLOWERS_FILE"
+            git commit -m "Aktualisiere Follower-Liste - $(echo "$NEW_FOLLOWERS" | wc -l) neue Follower begrüßt" || true
+            git push || true
+          fi
+          
+          # Aufräumen
+          rm -f current_followers.txt
+          
+          echo "✅ Workflow abgeschlossen!"
