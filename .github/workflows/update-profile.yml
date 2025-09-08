@@ -1,12 +1,16 @@
 name: Update Profile README Stats
 
 on:
+  push:                     # läuft bei jedem Push ins Repo
+    branches:
+      - main
+      - master
   schedule:
-    - cron: '0 6 * * *'    # täglich 06:00 UTC — anpassen nach Bedarf
-  workflow_dispatch: {}    # manuelles Ausführen möglich
+    - cron: '0 6 * * *'      # zusätzlich täglich 06:00 UTC
+  workflow_dispatch: {}     # manuell startbar
 
 permissions:
-  contents: write         # benötigt zum Pushen in das Repo
+  contents: write
 
 jobs:
   update-readme:
