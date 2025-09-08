@@ -10,7 +10,7 @@ import datetime
 import requests
 
 # Konfiguration
-USERNAME = os.environ.get("GH_USERNAME", "your-username")
+USERNAME = os.environ.get("GH_USERNAME", "AustrianNoah")
 REPO_NAME = os.environ.get("GH_REPO", USERNAME)
 README_PATH = "README.md"
 IMAGE_PATH = "assets/github-stats.png"  # wir speichern das von the service erzeugte PNG lokal
