@@ -34,7 +34,7 @@ jobs:
           GH_REPO: AustrianNoah
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python update_readme.py
+          python old.py
 
       - name: Commit & push changes (fallback)
         if: always()
