@@ -1,0 +1,52 @@
+name: Update Profile README Stats
+
+on:
+  schedule:
+    - cron: '0 6 * * *'    # täglich 06:00 UTC — anpassen nach Bedarf
+  workflow_dispatch: {}    # manuelles Ausführen möglich
+
+permissions:
+  contents: write         # benötigt zum Pushen in das Repo
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run update script
+        env:
+          GH_USERNAME: AustrianNoah
+          GH_REPO: AustrianNoah
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python update_readme.py
+
+      - name: Commit & push changes (fallback)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update profile stats (workflow)"
+            git push
+          else
+            echo "No changes to commit."
+          fi
