@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# update_readme_matplotlib_lines.py
-# Erzeugt Stat-Bilder mit matplotlib und zählt Codezeilen über alle (nicht-fork) Repos.
-# requirements.txt includes: requests, gitpython, matplotlib, pillow
-
 import os
 import datetime
 import tempfile
@@ -10,7 +5,6 @@ from pathlib import Path
 import requests
 from git import Repo, GitCommandError
 import matplotlib.pyplot as plt
-import subprocess
 
 # ------------- Konfiguration -------------
 USERNAME = os.environ.get("GH_USERNAME", "AustrianNoah")
@@ -22,11 +16,11 @@ SVG_LANGS = f"{OUT_DIR}/github_stats_langs.svg"
 PNG_CARD = f"{OUT_DIR}/github_stats_card.png"
 SVG_CARD = f"{OUT_DIR}/github_stats_card.svg"
 COMMIT_MESSAGE = "chore: update profile stats (matplotlib + line counts)"
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # Optional but recommended
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # Optional but empfohlen
 # Dateiendungen, die als Quellcode/Text gezählt werden
-CODE_EXTS = {".py",".js",".ts",".java",".c",".cpp",".h",".hpp",".go",".rb",".rs",".swift",
-             ".kt",".kts",".scala",".php",".html",".css",".scss",".md",".json",".yaml",".yml",
-             ".sh",".ps1",".rs",".lua",".pl",".r"}
+CODE_EXTS = {".py", ".js", ".ts", ".java", ".c", ".cpp", ".h", ".hpp", ".go", ".rb", ".rs", ".swift",
+             ".kt", ".kts", ".scala", ".php", ".html", ".css", ".scss", ".md", ".json", ".yaml", ".yml",
+             ".sh", ".ps1", ".lua", ".pl", ".r"}
 # Max Repos to clone (safety)
 MAX_CLONES = 20
 # ------------- Ende Konfiguration -------------
@@ -42,7 +36,12 @@ def fetch_repos(username):
     repos = []
     page = 1
     while True:
-        r = requests.get(f"https://api.github.com/users/{username}/repos", params={"per_page":100,"page":page,"sort":"updated"}, headers=HEADERS, timeout=20)
+        r = requests.get(
+            f"https://api.github.com/users/{username}/repos",
+            params={"per_page": 100, "page": page, "sort": "updated"},
+            headers=HEADERS,
+            timeout=20,
+        )
         r.raise_for_status()
         batch = r.json()
         if not batch:
@@ -54,41 +53,50 @@ def fetch_repos(username):
 def count_lines_in_dir(path: Path):
     total = 0
     files_counted = 0
-    for p in path.rglob('*'):
+    for p in path.rglob("*"):
         if p.is_file():
             if p.suffix.lower() in CODE_EXTS:
                 try:
-                    with p.open('rb') as f:
-                        # decode heuristics: try utf-8, fallback latin-1
+                    # read in binary then decode to avoid issues
+                    b = p.read_bytes()
+                    try:
+                        content = b.decode("utf-8")
+                    except UnicodeDecodeError:
                         try:
-                            content = f.read().decode('utf-8')
-                        except UnicodeDecodeError:
-                            try:
-                                content = f.read().decode('latin-1')
-                            except Exception:
-                                continue
-                        lines = content.count('\n') + 1 if content else 0
-                        total += lines
-                        files_counted += 1
+                            content = b.decode("latin-1")
+                        except Exception:
+                            continue
+                    # count lines: number of '\n' occurrences; if file non-empty add 1
+                    lines = content.count("\n")
+                    # if file doesn't end with newline, lines = count('\n') + 1 unless empty
+                    if content and not content.endswith("\n"):
+                        lines += 1
+                    total += lines
+                    files_counted += 1
                 except Exception:
                     continue
     return total, files_counted
 
 def clone_and_count(repo_clone_url, default_branch, tmpdir, auth_token=None):
-    # Clone single-repo shallow default branch
-    clone_path = Path(tmpdir) / (repo_clone_url.split('/')[-1].replace('.git',''))
+    clone_path = Path(tmpdir) / (repo_clone_url.split("/")[-1].replace(".git", ""))
     git_url = repo_clone_url
     if auth_token:
-        # insert token for private access: https://<token>@github.com/owner/repo.git
-        git_url = git_url.replace("https://", f"https://{auth_token}@")
+        # insert token for cloning private repos: https://<token>@github.com/owner/repo.git
+        if git_url.startswith("https://"):
+            git_url = git_url.replace("https://", f"https://{auth_token}@")
     try:
-        Repo.clone_from(git_url, clone_path, branch=default_branch, depth=1, single_branch=True)
+        if default_branch:
+            Repo.clone_from(git_url, clone_path, branch=default_branch, depth=1, single_branch=True)
+        else:
+            Repo.clone_from(git_url, clone_path, depth=1)
     except GitCommandError:
-        # Try without specifying branch
         try:
             Repo.clone_from(git_url, clone_path, depth=1)
         except Exception:
-            return 0,0
+            return 0, 0
+    except Exception:
+        return 0, 0
+
     lines, files = count_lines_in_dir(clone_path)
     return lines, files
 
@@ -114,35 +122,58 @@ def make_bar_chart_top_languages(lang_totals, username, out_png, out_svg, top_n=
     if not lang_totals:
         lang_totals = {"No code": 1}
     items = sorted(lang_totals.items(), key=lambda kv: kv[1], reverse=True)[:top_n]
-    labels = [k for k,v in items][::-1]
-    values = [v for k,v in items][::-1]
-    total = sum(values)
-    perc = [v/total for v in values]
+    labels = [k for k, v in items][::-1]
+    values = [v for k, v in items][::-1]
+    total = sum(values) if values else 1
+    perc = [v / total for v in values]
 
     plt.style.use("seaborn-v0_8")
-    fig, ax = plt.subplots(figsize=(8,4.5), dpi=150)
-    bars = ax.barh(range(len(labels)), values, color=plt.cm.tab20.colors[:len(labels)])
+    fig, ax = plt.subplots(figsize=(8, 4.5), dpi=150)
+    bars = ax.barh(range(len(labels)), values, color=plt.cm.tab20.colors[: len(labels)])
     ax.set_yticks(range(len(labels)))
     ax.set_yticklabels(labels, fontsize=10)
     ax.set_xlabel("Bytes of code")
     ax.set_title(f"{username} — Top {len(labels)} languages")
     for i, b in enumerate(bars):
         w = b.get_width()
-        ax.text(w + total*0.01, b.get_y() + b.get_height()/2, f"{perc[i]*100:.1f}%", va="center", fontsize=9)
+        ax.text(w + total * 0.01, b.get_y() + b.get_height() / 2, f"{perc[i]*100:.1f}%", va="center", fontsize=9)
     plt.tight_layout()
     Path(out_png).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_png, bbox_inches="tight")
     fig.savefig(out_svg, bbox_inches="tight")
     plt.close(fig)
 
+def format_lines_k(lines: int) -> str:
+    """
+    Formatiere lines als z.B. '16,3k' (Tausender, eine Dezimalstelle).
+    Für <1000 wird die ganze Zahl zurückgegeben.
+    Komma statt Punkt (DE-Format).
+    """
+    if lines < 1000:
+        return str(lines)
+    val = lines / 1000.0
+    s = f"{val:.1f}"
+    if s.endswith(".0"):
+        s = s[:-2] + "k"
+    else:
+        s = s + "k"
+    # Komma als Dezimaltrennzeichen
+    s = s.replace(".", ",")
+    return s
+
 def make_summary_card(user_info, repo_count, follower_count, total_lines, out_png, out_svg):
     plt.style.use("classic")
-    fig, ax = plt.subplots(figsize=(8,2), dpi=150)
+    fig, ax = plt.subplots(figsize=(8, 2), dpi=150)
     ax.axis("off")
     name = user_info.get("name") or user_info.get("login")
     bio = user_info.get("bio") or ""
     created = user_info.get("created_at", "")[:10]
-    text = f"{name}  •  @{user_info.get('login')}\n\n{bio}\n\nRepos: {repo_count}    Followers: {follower_count}    Code lines (est.): {total_lines:,}    Joined: {created}"
+    lines_fmt = format_lines_k(total_lines)
+    text = (
+        f"{name}  •  @{user_info.get('login')}\n\n"
+        f"{bio}\n\n"
+        f"Repos: {repo_count}    Followers: {follower_count}    Code lines (est.): {lines_fmt}    Joined: {created}"
+    )
     ax.text(0, 0.9, text, fontsize=11, va="top")
     Path(out_png).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_png, bbox_inches="tight")
@@ -194,13 +225,14 @@ if __name__ == "__main__":
     start = "<!-- STATS:START -->"
     end = "<!-- STATS:END -->"
     ts = datetime.datetime.utcnow().isoformat() + "Z"
+    lines_display = format_lines_k(total_lines)
     section = (
         f"{start}\n"
         f"![languages]({OUT_DIR}/github_stats_langs.png)\n\n"
         f"<img src=\"{OUT_DIR}/github_stats_card.svg\" alt=\"summary card\">\n\n"
         f"- **Repos:** {repo_count}\n"
         f"- **Followers:** {follower_count}\n"
-        f"- **Estimated code lines (counted {clones} repos):** {total_lines:,}\n"
+        f"- **Estimated code lines (counted {clones} repos):** {lines_display}\n"
         f"- **Updated (UTC):** {ts}\n"
         f"{end}"
     )
