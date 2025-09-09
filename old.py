@@ -22,7 +22,7 @@ CODE_EXTS = {".py", ".js", ".ts", ".java", ".c", ".cpp", ".h", ".hpp", ".go", ".
              ".kt", ".kts", ".scala", ".php", ".html", ".css", ".scss", ".md", ".json", ".yaml", ".yml",
              ".sh", ".ps1", ".lua", ".pl", ".r"}
 # Max Repos to clone (safety)
-MAX_CLONES = 20
+MAX_CLONES = 10
 # ------------- Ende Konfiguration -------------
 
 HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
@@ -133,7 +133,7 @@ def make_bar_chart_top_languages(lang_totals, username, out_png, out_svg, top_n=
     ax.set_yticks(range(len(labels)))
     ax.set_yticklabels(labels, fontsize=10)
     ax.set_xlabel("Bytes of code")
-    ax.set_title(f"{username} — Top {len(labels)} languages")
+    ax.set_title(f"{username} — TOP {len(labels)} Languages")
     for i, b in enumerate(bars):
         w = b.get_width()
         ax.text(w + total * 0.01, b.get_y() + b.get_height() / 2, f"{perc[i]*100:.1f}%", va="center", fontsize=9)
