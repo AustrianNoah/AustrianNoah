@@ -22,7 +22,7 @@ CODE_EXTS = {".py", ".js", ".ts", ".java", ".c", ".cpp", ".h", ".hpp", ".go", ".
              ".kt", ".kts", ".scala", ".php", ".html", ".css", ".scss", ".md", ".json", ".yaml", ".yml",
              ".sh", ".ps1", ".lua", ".pl", ".r"}
 # Max Repos to clone (safety)
-MAX_CLONES = 10
+MAX_CLONES = 30
 # ------------- Ende Konfiguration -------------
 
 HEADERS = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
