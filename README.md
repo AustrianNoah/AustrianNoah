@@ -7,7 +7,7 @@
 <img src="assets/stats/github_stats_card.svg" alt="summary card">
 
 - **Repos:** 59
-- **Followers:** 6
+- **Followers:** 5
 - **Estimated code lines (counted 30 repos):** 34,1k
-- **Updated (UTC):** 2026-08-26T07:00:49.815008Z
+- **Updated (UTC):** 2026-08-27T17:34:47.014885Z
 <!-- STATS:END -->
