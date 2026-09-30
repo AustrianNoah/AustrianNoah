@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-09-29T12:39:05.360597</dc:date>
+    <dc:date>2026-09-30T12:24:46.464840</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -358,7 +358,7 @@ z
     <g transform="translate(7.2 51.713469) scale(0.11 -0.11)"/>
     <!--  -->
     <g transform="translate(7.2 64.031063) scale(0.11 -0.11)"/>
-    <!-- Repos: 60    Followers: 7    Code lines (est.): 35,5k    Joined: 2023-11-23 -->
+    <!-- Repos: 60    Followers: 8    Code lines (est.): 35,5k    Joined: 2023-11-23 -->
     <g transform="translate(7.2 76.348656) scale(0.11 -0.11)">
      <defs>
       <path id="DejaVuSans-52" d="M 2841 2188 
@@ -540,14 +540,43 @@ L 1184 0
 L 269 3500 
 z
 " transform="scale(0.015625)"/>
-      <path id="DejaVuSans-37" d="M 525 4666 
-L 3525 4666 
-L 3525 4397 
-L 1831 0 
-L 1172 0 
-L 2766 4134 
-L 525 4134 
-L 525 4666 
+      <path id="DejaVuSans-38" d="M 2034 2216 
+Q 1584 2216 1326 1975 
+Q 1069 1734 1069 1313 
+Q 1069 891 1326 650 
+Q 1584 409 2034 409 
+Q 2484 409 2743 651 
+Q 3003 894 3003 1313 
+Q 3003 1734 2745 1975 
+Q 2488 2216 2034 2216 
+z
+M 1403 2484 
+Q 997 2584 770 2862 
+Q 544 3141 544 3541 
+Q 544 4100 942 4425 
+Q 1341 4750 2034 4750 
+Q 2731 4750 3128 4425 
+Q 3525 4100 3525 3541 
+Q 3525 3141 3298 2862 
+Q 3072 2584 2669 2484 
+Q 3125 2378 3379 2068 
+Q 3634 1759 3634 1313 
+Q 3634 634 3220 271 
+Q 2806 -91 2034 -91 
+Q 1263 -91 848 271 
+Q 434 634 434 1313 
+Q 434 1759 690 2068 
+Q 947 2378 1403 2484 
+z
+M 1172 3481 
+Q 1172 3119 1398 2916 
+Q 1625 2713 2034 2713 
+Q 2441 2713 2670 2916 
+Q 2900 3119 2900 3481 
+Q 2900 3844 2670 4047 
+Q 2441 4250 2034 4250 
+Q 1625 4250 1398 4047 
+Q 1172 3844 1172 3481 
 z
 " transform="scale(0.015625)"/>
       <path id="DejaVuSans-43" d="M 4122 4306 
@@ -793,7 +822,7 @@ z
      <use xlink:href="#DejaVuSans-73" transform="translate(1039.384766 0)"/>
      <use xlink:href="#DejaVuSans-3a" transform="translate(1091.484375 0)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1125.175781 0)"/>
-     <use xlink:href="#DejaVuSans-37" transform="translate(1156.962891 0)"/>
+     <use xlink:href="#DejaVuSans-38" transform="translate(1156.962891 0)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1220.585938 0)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1252.373047 0)"/>
      <use xlink:href="#DejaVuSans-20" transform="translate(1284.160156 0)"/>
